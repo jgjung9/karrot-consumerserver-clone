@@ -1,3 +1,18 @@
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/chatdb
+    username: root
+    password: 1234
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
   application:
     name: consumer
