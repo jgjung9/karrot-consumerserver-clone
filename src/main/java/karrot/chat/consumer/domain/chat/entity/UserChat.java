@@ -1,7 +1,6 @@
 package karrot.chat.consumer.domain.chat.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 
 @Entity
