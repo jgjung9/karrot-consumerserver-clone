@@ -1,7 +1,6 @@
 package karrot.chat.consumer.domain.chat.service;
 
 import karrot.chat.consumer.domain.chat.entity.Message;
-import karrot.chat.consumer.domain.chat.repository.MessageRepository;
 import karrot.chat.consumer.domain.chat.repository.UserChatRepository;
 import karrot.chat.consumer.infra.redis.repository.UserSessionRepository;
 import karrot.chat.consumer.domain.chat.dto.SendMessage;
@@ -20,18 +19,14 @@ import java.util.List;
 public class ChatService {
 
     private final RestTemplate restTemplate;
-    private final MessageRepository messageRepository;
     private final UserChatRepository userChatRepository;
     private final UserSessionRepository userSessionRepository;
 
     @Transactional
-    public void sendChat(Long chatId, Long senderId, String messageBody, LocalDateTime createAt) {
+    public void sendChat(Long chatId, Long senderId, String messageBody, LocalDateTime createdAt) {
         log.debug("sendChat");
 
-        Message message = new Message(null, chatId, senderId, messageBody, createAt);
-        messageRepository.save(message);
-
-        List<Long> userIds = userChatRepository.findAllByChatId(chatId).stream()
+        List<Long> userIds = userChatRepository.findByChatId(chatId).stream()
                 .map(uc -> uc.getUserId())
                 .toList();
         log.debug("userIds = {}", userIds);
@@ -49,10 +44,16 @@ public class ChatService {
                     if (session.getUserId().equals(senderId)) {
                         return;
                     }
-                    SendMessage request = new SendMessage(session.getUserId(), chatId, senderId, messageBody, createAt);
+                    SendMessage request = SendMessage.builder()
+                            .senderId(senderId)
+                            .chatId(chatId)
+                            .receiverId(session.getUserId())
+                            .message(messageBody)
+                            .createdAt(createdAt)
+                            .build();
                     log.debug("sendChat request = {}", request);
                     restTemplate.put(
-                            "http://" + session.getServerUrl() + "/chat/send",
+                            "http://" + session.getServerUrl() + "/chat/deliver",
                             request
                     );
                 });

@@ -26,7 +26,7 @@ public class RedisStreamConsumer {
     private final String streamKey = "chat-stream";
     private final String groupName = "chat-consumer";
     private final String consumerName = UUID.randomUUID().toString();
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
     @Value("${scheduling.enabled:true}")
     private boolean scheduling;
 
@@ -38,7 +38,7 @@ public class RedisStreamConsumer {
     public void createConsumerGroup() {
         if (!redisTemplate.hasKey(streamKey)) {
             redisTemplate.opsForStream()
-                    .add(streamKey, Map.of("createAt", LocalDateTime.now().toString()));
+                    .add(streamKey, Map.of("createdAt", LocalDateTime.now().toString()));
         }
 
         boolean exists = false;
@@ -67,7 +67,7 @@ public class RedisStreamConsumer {
                     Long.valueOf((String) chatInfo.get("chatId")),
                     Long.valueOf((String) chatInfo.get("senderId")),
                     (String) chatInfo.get("message"),
-                    LocalDateTime.parse((String) chatInfo.get("createAt"), formatter)
+                    LocalDateTime.parse((String) chatInfo.get("createdAt"), formatter)
             );
             redisTemplate.opsForStream()
                     .acknowledge(streamKey, groupName, chatDatum.getId());
