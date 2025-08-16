@@ -1,32 +1,11 @@
 package karrot.chat.consumer.domain.chat.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import karrot.chat.consumer.domain.chat.entity.QUserChat;
 import karrot.chat.consumer.domain.chat.entity.UserChat;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import karrot.chat.consumer.domain.chat.entity.UserChatId;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-import static karrot.chat.consumer.domain.chat.entity.QUserChat.userChat;
-
-@Repository
-@RequiredArgsConstructor
-@Transactional
-public class UserChatRepository {
-
-    private final EntityManager em;
-    private final JPAQueryFactory queryFactory;
-
-    public void save(UserChat userChat) {
-        return;
-    }
-
-    public List<UserChat> findAllByChatId(Long chatId) {
-        return queryFactory.selectFrom(userChat)
-                .where(userChat.chatId.eq(chatId))
-                .fetch();
-    }
+public interface UserChatRepository extends JpaRepository<UserChat, UserChatId>, UserChatRepositoryCustom {
+    List<UserChat> findByChatId(Long chatId);
 }
