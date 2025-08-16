@@ -38,10 +38,12 @@ public class UserSessionRepository {
                 continue;
             }
 
-            UserSession session = new UserSession();
-            session.setUserId(userIds.get(i));
-            session.setServerUrl(serverInfo);
-            sessions.add(session);
+            sessions.add(
+                    UserSession.builder()
+                    .userId(userIds.get(i))
+                    .serverUrl(serverInfo)
+                    .build()
+            );
         }
         log.debug("findAllByUserIds sessions = {}", sessions);
         return sessions;
